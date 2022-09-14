@@ -1,11 +1,17 @@
+#pragma once
+
 #include "Mode.hpp"
 
 #include "Scene.hpp"
+#include "OctrisPiece.hpp"
 
 #include <glm/glm.hpp>
 
 #include <vector>
 #include <deque>
+
+#define DURATION_BTW_MOVES 1.0f
+
 
 struct PlayMode : Mode {
 	PlayMode();
@@ -27,15 +33,13 @@ struct PlayMode : Mode {
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
 
-	//hexapod leg to wobble:
-	Scene::Transform *hip = nullptr;
-	Scene::Transform *upper_leg = nullptr;
-	Scene::Transform *lower_leg = nullptr;
-	glm::quat hip_base_rotation;
-	glm::quat upper_leg_base_rotation;
-	glm::quat lower_leg_base_rotation;
-	float wobble = 0.0f;
-	
+	OctrisPiece *current_piece;
+	std::vector< OctrisPiece * > pieces;
+
+	float next_move = 3 * DURATION_BTW_MOVES;
+	float timer = 0.0f;
+	unsigned int score = 0;
+
 	//camera:
 	Scene::Camera *camera = nullptr;
 

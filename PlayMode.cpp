@@ -7,49 +7,97 @@
 #include "Load.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
+#include "logging.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
 #include <random>
 
-GLuint hexapod_meshes_for_lit_color_texture_program = 0;
+#define DEBUG
+
+GLuint octris_meshes_for_lit_color_texture_program = 0;
 Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
-	MeshBuffer const *ret = new MeshBuffer(data_path("hexapod.pnct"));
-	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
+	MeshBuffer const *ret = new MeshBuffer(data_path("octris.pnct"));
+	octris_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
 	return ret;
 });
 
+static void init_pipeline(Scene::Drawable::Pipeline &pipeline, const Mesh &mesh) {
+	pipeline = lit_color_texture_program_pipeline;
+	pipeline.vao = octris_meshes_for_lit_color_texture_program;
+	pipeline.type = mesh.type;
+	pipeline.start = mesh.start;
+	pipeline.count = mesh.count;
+}
+
 Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
-	return new Scene(data_path("hexapod.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
+	return new Scene(data_path("octris.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
 		Mesh const &mesh = hexapod_meshes->lookup(mesh_name);
 
-		scene.drawables.emplace_back(transform);
-		Scene::Drawable &drawable = scene.drawables.back();
+		if (mesh_name == CUBE_MESH_NAME_RED) {
+			init_pipeline(CUBE_PIPELINE_RED, mesh);
+			LOG("Loaded red");
+			return;
+		}
 
-		drawable.pipeline = lit_color_texture_program_pipeline;
+		if (mesh_name == CUBE_MESH_NAME_ORANGE) {
+			init_pipeline(CUBE_PIPELINE_ORANGE, mesh);
+			LOG("Loaded orange");
+			return;
+		}
 
-		drawable.pipeline.vao = hexapod_meshes_for_lit_color_texture_program;
-		drawable.pipeline.type = mesh.type;
-		drawable.pipeline.start = mesh.start;
-		drawable.pipeline.count = mesh.count;
+		if (mesh_name == CUBE_MESH_NAME_YELLOW) {
+			init_pipeline(CUBE_PIPELINE_YELLOW, mesh);
+			LOG("Loaded yellow");
+			return;
+		}
 
+		if (mesh_name == CUBE_MESH_NAME_GREEN) {
+			init_pipeline(CUBE_PIPELINE_GREEN, mesh);
+			LOG("Loaded green");
+			return;
+		}
+
+		if (mesh_name == CUBE_MESH_NAME_TEAL) {
+			init_pipeline(CUBE_PIPELINE_TEAL, mesh);
+			LOG("Loaded teal");
+			return;
+		}
+
+		if (mesh_name == CUBE_MESH_NAME_BLUE) {
+			init_pipeline(CUBE_PIPELINE_BLUE, mesh);
+			LOG("Loaded blue");
+			return;
+		}
+
+		if (mesh_name == CUBE_MESH_NAME_PURPLE) {
+			init_pipeline(CUBE_PIPELINE_PURPLE, mesh);
+			LOG("Loaded purple");
+			return;
+		}
+
+		LOG("Loaded base");
+		OCTRIS_BASE = new Scene::Drawable(transform);
+		init_pipeline(OCTRIS_BASE->pipeline, mesh);
 	});
 });
 
 PlayMode::PlayMode() : scene(*hexapod_scene) {
 	//get pointers to leg for convenience:
-	for (auto &transform : scene.transforms) {
-		if (transform.name == "Hip.FL") hip = &transform;
-		else if (transform.name == "UpperLeg.FL") upper_leg = &transform;
-		else if (transform.name == "LowerLeg.FL") lower_leg = &transform;
-	}
-	if (hip == nullptr) throw std::runtime_error("Hip not found.");
-	if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
-	if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
+	// for (auto &transform : scene.transforms) {
+	// 	if (transform.name == "Hip.FL") hip = &transform;
+	// 	else if (transform.name == "UpperLeg.FL") upper_leg = &transform;
+	// 	else if (transform.name == "LowerLeg.FL") lower_leg = &transform;
+	// }
+	// if (hip == nullptr) throw std::runtime_error("Hip not found.");
+	// if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
+	// if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
 
-	hip_base_rotation = hip->rotation;
-	upper_leg_base_rotation = upper_leg->rotation;
-	lower_leg_base_rotation = lower_leg->rotation;
+	// hip_base_rotation = hip->rotation;
+	// upper_leg_base_rotation = upper_leg->rotation;
+	// lower_leg_base_rotation = lower_leg->rotation;
+
+	current_piece = new OctrisPiece();
 
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
@@ -57,6 +105,10 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 }
 
 PlayMode::~PlayMode() {
+	for (auto piece : pieces) {
+		delete piece;
+	}
+	delete OCTRIS_BASE;
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
@@ -122,24 +174,24 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 void PlayMode::update(float elapsed) {
 
 	//slowly rotates through [0,1):
-	wobble += elapsed / 10.0f;
-	wobble -= std::floor(wobble);
+	// wobble += elapsed / 10.0f;
+	// wobble -= std::floor(wobble);
 
-	hip->rotation = hip_base_rotation * glm::angleAxis(
-		glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
-		glm::vec3(0.0f, 1.0f, 0.0f)
-	);
-	upper_leg->rotation = upper_leg_base_rotation * glm::angleAxis(
-		glm::radians(7.0f * std::sin(wobble * 2.0f * 2.0f * float(M_PI))),
-		glm::vec3(0.0f, 0.0f, 1.0f)
-	);
-	lower_leg->rotation = lower_leg_base_rotation * glm::angleAxis(
-		glm::radians(10.0f * std::sin(wobble * 3.0f * 2.0f * float(M_PI))),
-		glm::vec3(0.0f, 0.0f, 1.0f)
-	);
+	// hip->rotation = hip_base_rotation * glm::angleAxis(
+	// 	glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
+	// 	glm::vec3(0.0f, 1.0f, 0.0f)
+	// );
+	// upper_leg->rotation = upper_leg_base_rotation * glm::angleAxis(
+	// 	glm::radians(7.0f * std::sin(wobble * 2.0f * 2.0f * float(M_PI))),
+	// 	glm::vec3(0.0f, 0.0f, 1.0f)
+	// );
+	// lower_leg->rotation = lower_leg_base_rotation * glm::angleAxis(
+	// 	glm::radians(10.0f * std::sin(wobble * 3.0f * 2.0f * float(M_PI))),
+	// 	glm::vec3(0.0f, 0.0f, 1.0f)
+	// );
+	timer += elapsed;
 
-	//move camera:
-	{
+	{ //move camera:
 
 		//combine inputs into a move:
 		constexpr float PlayerSpeed = 30.0f;
@@ -165,9 +217,40 @@ void PlayMode::update(float elapsed) {
 	right.downs = 0;
 	up.downs = 0;
 	down.downs = 0;
+
+	while (timer > next_move) {
+		//move current piece down if possible
+		LOG("move at " << next_move);
+		if (!current_piece->fall(pieces)) {
+			pieces.emplace_back(current_piece);
+			current_piece = new OctrisPiece();
+		}
+
+		next_move += DURATION_BTW_MOVES;
+	}
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
+	{ //repopulate drawable
+		scene.drawables.clear();
+
+		// base
+		scene.drawables.emplace_back(*OCTRIS_BASE);
+
+		// "settled" pieces
+		for (auto piece : pieces) {
+			for (int i = 0; i < 8; i++) {
+				if (piece->should_hide[i]) continue;
+				scene.drawables.emplace_back(piece->blocks[i]);
+			}
+		}
+
+		// current piece
+		for (int i = 0; i < 8; i++) {
+			scene.drawables.emplace_back(current_piece->blocks[i]);
+		}
+	}
+
 	//update camera aspect ratio for drawable:
 	camera->aspect = float(drawable_size.x) / float(drawable_size.y);
 
