@@ -4,8 +4,8 @@
 
 #include <random>
 
-#define M_PI 3.14159265358979323846f
-#define ROT_FACTOR (M_PI / 2.0f)
+#define CONST_PI 3.14159265358979323846f
+#define ROT_FACTOR (CONST_PI / 2.0f)
 
 // To be set during scene loading
 Scene::Drawable::Pipeline CUBE_PIPELINE_RED;
@@ -193,7 +193,7 @@ void OctrisPiece::add_to_board(OctrisStage &stage) {
 		assert(0 <= y && y < STAGE_LENGTH);
 		assert(0 <= z);
 
-		while (z >= stage.size()) {
+		while (z >= (int)stage.size()) {
 			stage.emplace_back();
 		}
 
