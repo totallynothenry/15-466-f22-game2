@@ -11,7 +11,7 @@ with a 3D spin. Notably:
 - The stage is now 20 tall, 10 wide, and 10 deep.
 - When a piece can no longer move down, it is "cemented" into the world and a new piece is spawned.
 - If a freshly spawned piece collides with the world, then the game is over!
-- If any horizontal slice of the 20x10x10 stage is fully filled, that slice is clear and the player is rewarded with score. Clearing more slices at one time rewards more score.
+- If any horizontal slice of the 20x10x10 stage is fully filled, that slice is cleared and the player is rewarded with score. Clearing more slices at one time rewards more score.
 
 ## Screen Shot:
 
@@ -19,13 +19,13 @@ with a 3D spin. Notably:
 
 ## How To Play:
 
-The goal of Octris is to get a high a score as possible. As movement and rotation are much more complex, the game is slower than classic Tetris. In addition, a pause mechanic has been added as 3D camera movement can be difficult when under a time constraint.
+The goal of Octris is to get a high a score as possible. As movement and rotation are much more complex, the game's pace has been reduced to give players more time to move the piece. In addition, a pause mechanic has been added as 3D camera movement can be difficult when under a time constraint.
 
 Currently, pieces fall down 1 block every 3 seconds when the game is not paused. The game begins in a paused state and there is a 9 second grace period where no falling will occur. If a block collides when attempting to fall, it is cemeneted.
 
 General controls:
-1. Mouse to rotate the camera (either click captures the mouse, escape releases the mouse)
-2. Arrow keys to move on the horizontal plane of the camera
+1. Mouse movement to rotate the camera (clicking captures the mouse, escape releases the mouse)
+2. Arrow keys to translate the camera
 3. P to toggle pause on the game
 
 Octris piece translation controls:
