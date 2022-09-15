@@ -27,5 +27,5 @@ TODO List:
     b. translation [DONE]
     c. rotation [DONE]
     d. random spawn [DONE]
-6. Row clear mechanic
-7. Timer & score
+6. Row clear mechanic [DONE]
+7. Timer & score [DONE]

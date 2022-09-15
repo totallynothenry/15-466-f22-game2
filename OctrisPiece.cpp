@@ -35,7 +35,7 @@ static Scene::Drawable *get_drawable(
 static OctrisPieceType get_random_type() {
 	// TODO select random enum val
 	// return static_cast<OctrisPieceType>(std::rand() % 2);
-	return OctrisPieceType::I;
+	return OctrisPieceType::O;
 }
 
 OctrisPiece::OctrisPiece() : OctrisPiece(get_random_type()) {

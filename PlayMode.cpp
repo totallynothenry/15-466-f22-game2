@@ -226,8 +226,8 @@ void PlayMode::update_stage() {
 			//Get rid of this slice
 			cleanup_slice(slice);
 			stage.erase(stage.begin() + slice_idx);
-			assert(slice_idx > 0);
-			slice_idx--;
+			assert(slice_idx >= 0);
+			slice_idx--; // keeps slice_idx the same for the next iteration
 			shift++;
 			continue;
 		}
@@ -235,15 +235,17 @@ void PlayMode::update_stage() {
 		if (shift == 0) continue;
 
 		//Update z-offset of all blocks in the slice
+		LOG("Shifting slice " << slice_idx << " by " << shift);
 		for (auto drawable : slice) {
-			LOG("Shifting slice " << slice_idx);
 			if (drawable == nullptr) continue;
-			drawable->transform->position.z -= (float)shift;
+			drawable->transform->position.z -= (float)(shift * BLOCK_LENGTH);
 		}
 	}
 
 	// Same scoring as BPS tetris (since we don't have a level mechanic)
 	switch (shift) {
+	case 0:
+		return;
 	case 1:
 		score += 40;
 		return;
@@ -332,9 +334,6 @@ void PlayMode::update(float elapsed) {
 
 		if (slam.downs > 0) {
 			while (current_piece->move(stage, 0, 0, -1, 0, 0, 0));
-		}
-
-		if (trans_neg_z.downs > 0 || slam.downs > 0) {
 			bool spawn = !current_piece->fall(stage);
 			assert(spawn);
 			current_piece = new OctrisPiece();
