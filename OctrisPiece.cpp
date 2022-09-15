@@ -33,9 +33,7 @@ static Scene::Drawable *get_drawable(
 }
 
 static OctrisPieceType get_random_type() {
-	// TODO select random enum val
-	// return static_cast<OctrisPieceType>(std::rand() % 2);
-	return OctrisPieceType::O;
+	return static_cast<OctrisPieceType>(std::rand() % 7);
 }
 
 OctrisPiece::OctrisPiece() : OctrisPiece(get_random_type()) {
@@ -77,14 +75,45 @@ OctrisPiece::OctrisPiece(OctrisPieceType type) {
 		blocks.emplace_back(get_drawable( 1.0f,  3.0f,  1.0f, block_offsets[6], &origin, CUBE_PIPELINE_PURPLE));
 		blocks.emplace_back(get_drawable( 1.0f,  1.0f, -1.0f, block_offsets[7], &origin, CUBE_PIPELINE_PURPLE));
 		return;
-	case L:
+	case J:
 		blocks.emplace_back(get_drawable(-1.0f, -1.0f,  1.0f, block_offsets[0], &origin, CUBE_PIPELINE_BLUE));
+		blocks.emplace_back(get_drawable(-1.0f, -1.0f, -1.0f, block_offsets[1], &origin, CUBE_PIPELINE_BLUE));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f, -1.0f, block_offsets[2], &origin, CUBE_PIPELINE_BLUE));
+		blocks.emplace_back(get_drawable(-1.0f,  3.0f, -1.0f, block_offsets[3], &origin, CUBE_PIPELINE_BLUE));
+		blocks.emplace_back(get_drawable( 1.0f, -1.0f,  1.0f, block_offsets[4], &origin, CUBE_PIPELINE_BLUE));
+		blocks.emplace_back(get_drawable( 1.0f, -1.0f, -1.0f, block_offsets[5], &origin, CUBE_PIPELINE_BLUE));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f, -1.0f, block_offsets[6], &origin, CUBE_PIPELINE_BLUE));
+		blocks.emplace_back(get_drawable( 1.0f,  3.0f, -1.0f, block_offsets[7], &origin, CUBE_PIPELINE_BLUE));
 		return;
-	case P:
+	case L:
+		blocks.emplace_back(get_drawable(-3.0f, -3.0f,  1.0f, block_offsets[0], &origin, CUBE_PIPELINE_ORANGE));
+		blocks.emplace_back(get_drawable(-3.0f, -1.0f,  1.0f, block_offsets[1], &origin, CUBE_PIPELINE_ORANGE));
+		blocks.emplace_back(get_drawable(-3.0f,  1.0f,  1.0f, block_offsets[2], &origin, CUBE_PIPELINE_ORANGE));
+		blocks.emplace_back(get_drawable(-1.0f, -3.0f,  1.0f, block_offsets[3], &origin, CUBE_PIPELINE_ORANGE));
+		blocks.emplace_back(get_drawable(-1.0f, -1.0f,  1.0f, block_offsets[4], &origin, CUBE_PIPELINE_ORANGE));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f,  1.0f, block_offsets[5], &origin, CUBE_PIPELINE_ORANGE));
+		blocks.emplace_back(get_drawable( 1.0f, -3.0f,  1.0f, block_offsets[6], &origin, CUBE_PIPELINE_ORANGE));
+		blocks.emplace_back(get_drawable( 1.0f, -1.0f,  1.0f, block_offsets[7], &origin, CUBE_PIPELINE_ORANGE));
 		return;
 	case S:
+		blocks.emplace_back(get_drawable(-1.0f, -1.0f, -1.0f, block_offsets[0], &origin, CUBE_PIPELINE_GREEN));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f, -1.0f, block_offsets[1], &origin, CUBE_PIPELINE_GREEN));
+		blocks.emplace_back(get_drawable( 1.0f, -1.0f, -1.0f, block_offsets[2], &origin, CUBE_PIPELINE_GREEN));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f, -1.0f, block_offsets[3], &origin, CUBE_PIPELINE_GREEN));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f,  1.0f, block_offsets[4], &origin, CUBE_PIPELINE_GREEN));
+		blocks.emplace_back(get_drawable(-1.0f,  3.0f,  1.0f, block_offsets[5], &origin, CUBE_PIPELINE_GREEN));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f,  1.0f, block_offsets[6], &origin, CUBE_PIPELINE_GREEN));
+		blocks.emplace_back(get_drawable( 1.0f,  3.0f,  1.0f, block_offsets[7], &origin, CUBE_PIPELINE_GREEN));
 		return;
 	case Z:
+		blocks.emplace_back(get_drawable(-1.0f, -1.0f, -1.0f, block_offsets[0], &origin, CUBE_PIPELINE_RED));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f, -1.0f, block_offsets[1], &origin, CUBE_PIPELINE_RED));
+		blocks.emplace_back(get_drawable( 1.0f, -1.0f, -1.0f, block_offsets[2], &origin, CUBE_PIPELINE_RED));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f, -1.0f, block_offsets[3], &origin, CUBE_PIPELINE_RED));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f,  1.0f, block_offsets[4], &origin, CUBE_PIPELINE_RED));
+		blocks.emplace_back(get_drawable( 1.0f,  3.0f,  1.0f, block_offsets[5], &origin, CUBE_PIPELINE_RED));
+		blocks.emplace_back(get_drawable( 3.0f,  1.0f,  1.0f, block_offsets[6], &origin, CUBE_PIPELINE_RED));
+		blocks.emplace_back(get_drawable( 3.0f,  3.0f,  1.0f, block_offsets[7], &origin, CUBE_PIPELINE_RED));
 		return;
 	default:
 		assert(false);

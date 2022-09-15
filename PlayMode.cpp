@@ -321,12 +321,12 @@ void PlayMode::update(float elapsed) {
 		if (trans_neg_y.downs > 0) dy--;
 		if (trans_neg_z.downs > 0) dz--;
 
-		if (rot_pos_x.downs > 0) dpsi--;
-		if (rot_neg_x.downs > 0) dpsi++;
+		if (rot_pos_x.downs > 0) dphi--;
+		if (rot_neg_x.downs > 0) dphi++;
 		if (rot_pos_y.downs > 0) dtheta--;
 		if (rot_neg_y.downs > 0) dtheta++;
-		if (rot_clockw.downs > 0) dphi++;
-		if (rot_countr.downs > 0) dphi--;
+		if (rot_clockw.downs > 0) dpsi--;
+		if (rot_countr.downs > 0) dpsi++;
 
 		if (dx != 0 || dy != 0 || dz != 0 || dphi != 0 || dtheta != 0 || dpsi != 0) {
 			current_piece->move(stage, dx, dy, dz, dphi, dtheta, dpsi);

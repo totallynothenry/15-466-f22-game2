@@ -49,9 +49,9 @@ enum OctrisPieceType {
 	I, // 2x4 plane
 	T, // 2-deep T shape
 	S, // 2-deep S shape
-	L, // 2-deep L shape
+	J, // 2-deep J shape
 	Z, // Two parallel 2x2 planes touching on one corner
-	P, // 3x3 plane with a corner cut out
+	L, // 3x3 plane with a corner cut out
 };
 
 // An 8-block octris piece (pseudo-hierarchy)

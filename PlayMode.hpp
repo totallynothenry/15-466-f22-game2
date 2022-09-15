@@ -10,7 +10,7 @@
 #include <vector>
 #include <deque>
 
-#define DURATION_BTW_MOVES 1.0f
+#define DURATION_BTW_MOVES 3.0f
 
 struct PlayMode : Mode {
 	PlayMode();

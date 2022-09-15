@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#define DEBUG
+// #define DEBUG
 
 #ifdef DEBUG
 #define LOG(ARGS) (std::cout << ARGS << std::endl)
