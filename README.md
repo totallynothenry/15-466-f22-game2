@@ -20,8 +20,12 @@ TODO List:
 1. Finish Octris scene (likely with different cubes) [DONE]
 2. Be able to load scene in game [DONE]
 3. Finish definitions for Octris pieces
-4. Be able to load pieces in game
+4. Be able to load pieces in game [DONE]
 
-5. Add dynamics for pieces (downward motion, translation, rotation, cementing, random spawn)
+5. Add dynamics for pieces
+    a. downward motion [DONE]
+    b. translation [DONE]
+    c. rotation [DONE]
+    d. random spawn [DONE]
 6. Row clear mechanic
 7. Timer & score

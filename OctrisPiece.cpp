@@ -4,10 +4,8 @@
 
 #include <random>
 
-// #define DEBUG
-
-#define SKIP_CHECK_DIST 4.0f
-#define TOLERANCE 0.5f
+#define M_PI 3.14159265358979323846f
+#define ROT_FACTOR (M_PI / 2.0f)
 
 // To be set during scene loading
 Scene::Drawable::Pipeline CUBE_PIPELINE_RED;
@@ -20,108 +18,181 @@ Scene::Drawable::Pipeline CUBE_PIPELINE_PURPLE;
 
 Scene::Drawable *OCTRIS_BASE = nullptr;
 
-static Scene::Drawable get_drawable(
-        float offset_x, float offset_y, float offset_z,
-        Scene::Transform &offset, Scene::Transform *parent,
-        Scene::Drawable::Pipeline &pipeline) {
-    offset.position.x = offset_x;
-    offset.position.y = offset_y;
-    offset.position.z = offset_z;
-    offset.parent = parent;
+static Scene::Drawable *get_drawable(
+		float offset_x, float offset_y, float offset_z,
+		Scene::Transform &offset, Scene::Transform *parent,
+		Scene::Drawable::Pipeline &pipeline) {
+	offset.position.x = offset_x;
+	offset.position.y = offset_y;
+	offset.position.z = offset_z;
+	offset.parent = parent;
 
-    Scene::Drawable drawable(&offset);
-    drawable.pipeline = pipeline;
-    return drawable;
+	Scene::Drawable *drawable = new Scene::Drawable(&offset);
+	drawable->pipeline = pipeline;
+	return drawable;
 }
 
 static OctrisPieceType get_random_type() {
-    // TODO select random enum val
-    return OctrisPieceType::CUBE;
+	// TODO select random enum val
+	// return static_cast<OctrisPieceType>(std::rand() % 2);
+	return OctrisPieceType::I;
 }
 
 OctrisPiece::OctrisPiece() : OctrisPiece(get_random_type()) {
 }
 
 OctrisPiece::OctrisPiece(OctrisPieceType type) {
-    // Create a cube piece
-    transform = Scene::Transform();
-    transform.position = SPAWN_POS;
+	// Create a cube piece
+	origin = Scene::Transform();
+	origin.position = SPAWN_POS;
 
-    switch (type) {
-    case CUBE:
-        blocks.emplace_back(get_drawable(-1.0f, -1.0f, -1.0f, block_transforms[0], &transform, CUBE_PIPELINE_YELLOW));
-        blocks.emplace_back(get_drawable(-1.0f, -1.0f,  1.0f, block_transforms[1], &transform, CUBE_PIPELINE_YELLOW));
-        blocks.emplace_back(get_drawable(-1.0f,  1.0f, -1.0f, block_transforms[2], &transform, CUBE_PIPELINE_YELLOW));
-        blocks.emplace_back(get_drawable(-1.0f,  1.0f,  1.0f, block_transforms[3], &transform, CUBE_PIPELINE_YELLOW));
-        blocks.emplace_back(get_drawable( 1.0f, -1.0f, -1.0f, block_transforms[4], &transform, CUBE_PIPELINE_YELLOW));
-        blocks.emplace_back(get_drawable( 1.0f, -1.0f,  1.0f, block_transforms[5], &transform, CUBE_PIPELINE_YELLOW));
-        blocks.emplace_back(get_drawable( 1.0f,  1.0f, -1.0f, block_transforms[6], &transform, CUBE_PIPELINE_YELLOW));
-        blocks.emplace_back(get_drawable( 1.0f,  1.0f,  1.0f, block_transforms[7], &transform, CUBE_PIPELINE_YELLOW));
-        break;
-    default:
-        assert(false);
-    }
+	switch (type) {
+	case O:
+		blocks.emplace_back(get_drawable(-1.0f, -1.0f, -1.0f, block_offsets[0], &origin, CUBE_PIPELINE_YELLOW));
+		blocks.emplace_back(get_drawable(-1.0f, -1.0f,  1.0f, block_offsets[1], &origin, CUBE_PIPELINE_YELLOW));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f, -1.0f, block_offsets[2], &origin, CUBE_PIPELINE_YELLOW));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f,  1.0f, block_offsets[3], &origin, CUBE_PIPELINE_YELLOW));
+		blocks.emplace_back(get_drawable( 1.0f, -1.0f, -1.0f, block_offsets[4], &origin, CUBE_PIPELINE_YELLOW));
+		blocks.emplace_back(get_drawable( 1.0f, -1.0f,  1.0f, block_offsets[5], &origin, CUBE_PIPELINE_YELLOW));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f, -1.0f, block_offsets[6], &origin, CUBE_PIPELINE_YELLOW));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f,  1.0f, block_offsets[7], &origin, CUBE_PIPELINE_YELLOW));
+		return;
+	case I:
+		blocks.emplace_back(get_drawable(1.0f, -1.0f, -3.0f, block_offsets[0], &origin, CUBE_PIPELINE_TEAL));
+		blocks.emplace_back(get_drawable(1.0f, -1.0f, -1.0f, block_offsets[1], &origin, CUBE_PIPELINE_TEAL));
+		blocks.emplace_back(get_drawable(1.0f, -1.0f,  1.0f, block_offsets[2], &origin, CUBE_PIPELINE_TEAL));
+		blocks.emplace_back(get_drawable(1.0f, -1.0f,  3.0f, block_offsets[3], &origin, CUBE_PIPELINE_TEAL));
+		blocks.emplace_back(get_drawable(1.0f,  1.0f, -3.0f, block_offsets[4], &origin, CUBE_PIPELINE_TEAL));
+		blocks.emplace_back(get_drawable(1.0f,  1.0f, -1.0f, block_offsets[5], &origin, CUBE_PIPELINE_TEAL));
+		blocks.emplace_back(get_drawable(1.0f,  1.0f,  1.0f, block_offsets[6], &origin, CUBE_PIPELINE_TEAL));
+		blocks.emplace_back(get_drawable(1.0f,  1.0f,  3.0f, block_offsets[7], &origin, CUBE_PIPELINE_TEAL));
+		return;
+	case T:
+		blocks.emplace_back(get_drawable(-1.0f, -1.0f,  1.0f, block_offsets[0], &origin, CUBE_PIPELINE_PURPLE));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f,  1.0f, block_offsets[1], &origin, CUBE_PIPELINE_PURPLE));
+		blocks.emplace_back(get_drawable(-1.0f,  3.0f,  1.0f, block_offsets[2], &origin, CUBE_PIPELINE_PURPLE));
+		blocks.emplace_back(get_drawable(-1.0f,  1.0f, -1.0f, block_offsets[3], &origin, CUBE_PIPELINE_PURPLE));
+		blocks.emplace_back(get_drawable( 1.0f, -1.0f,  1.0f, block_offsets[4], &origin, CUBE_PIPELINE_PURPLE));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f,  1.0f, block_offsets[5], &origin, CUBE_PIPELINE_PURPLE));
+		blocks.emplace_back(get_drawable( 1.0f,  3.0f,  1.0f, block_offsets[6], &origin, CUBE_PIPELINE_PURPLE));
+		blocks.emplace_back(get_drawable( 1.0f,  1.0f, -1.0f, block_offsets[7], &origin, CUBE_PIPELINE_PURPLE));
+		return;
+	case L:
+		blocks.emplace_back(get_drawable(-1.0f, -1.0f,  1.0f, block_offsets[0], &origin, CUBE_PIPELINE_BLUE));
+		return;
+	case P:
+		return;
+	case S:
+		return;
+	case Z:
+		return;
+	default:
+		assert(false);
+	}
 }
 
 void OctrisPiece::translate(int x, int y, int z) {
-    transform.position.x += (float)(x * BLOCK_LENGTH);
-    transform.position.y += (float)(y * BLOCK_LENGTH);
-    transform.position.z += (float)(z * BLOCK_LENGTH);
+	origin.position.x += (float)(x * BLOCK_LENGTH);
+	origin.position.y += (float)(y * BLOCK_LENGTH);
+	origin.position.z += (float)(z * BLOCK_LENGTH);
 }
 
-bool OctrisPiece::collides(const std::vector< OctrisPiece * > &pieces) {
-    /**
-     * This is ghetto collision. Since all the blocks should have integer coordinates and only move integer amounts,
-     * this just checks that the coordinates of any two blocks aren't the same (w.r.t a <1 tolerance)
-     */
-    for (auto &block_transform : block_transforms) {
-        glm::mat4x3 absolute = block_transform.make_local_to_world();
-        float x = absolute[3][0];
-        float y = absolute[3][1];
-        float z = absolute[3][2];
-
-        LOG("block pos: " << x << " " << y << " " << z);
-
-        if (z < TOLERANCE) {
-            LOG("floor collide");
-            // Below floor
-            return true;
-        }
-
-        for (auto piece : pieces) {
-            // If this piece is too far away, skip
-            if (std::abs(piece->transform.position.x - transform.position.x) > SKIP_CHECK_DIST
-                    && std::abs(piece->transform.position.y - transform.position.z) > SKIP_CHECK_DIST
-                    && std::abs(piece->transform.position.y - transform.position.z) > SKIP_CHECK_DIST) {
-                LOG("skipping check against piece" << piece);
-                continue;
-            }
-
-            LOG("checking against piece" << piece);
-
-            for (auto &pblock_transform : piece->block_transforms) {
-                glm::mat4x3 pabsolute = pblock_transform.make_local_to_world();
-                if (std::abs(pabsolute[3][0] - x) < TOLERANCE
-                        && std::abs(pabsolute[3][1] - y) < TOLERANCE
-                        && std::abs(pabsolute[3][2] - z) < TOLERANCE) {
-                    // Block collides with pblock
-                    LOG("block collide");
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
+void OctrisPiece::rotate(int phi, int theta, int psi) {
+	if (phi == 0 && theta == 0 && psi == 0) return;
+	origin.rotation *=
+		glm::quat(glm::vec3((float)theta * ROT_FACTOR, (float)phi * ROT_FACTOR, (float)psi * ROT_FACTOR));
 }
 
-bool OctrisPiece::fall(const std::vector< OctrisPiece * > &pieces) {
-    translate(0, 0, -1);
+bool OctrisPiece::collides(OctrisStage &stage) {
+	int levels = (int)stage.size();
+	for (auto &block_transform : block_offsets) {
+		LOG("Checking block collision");
+		glm::mat4x3 absolute = block_transform.make_local_to_world();
+		LOG("World coords: (" << absolute[3][0] << ", " << absolute[3][1] << ", " << absolute[3][2] << ")");
+		int x = CONVERT_LENGTH(absolute[3][0]);
+		int y = CONVERT_LENGTH(absolute[3][1]);
+		int z = CONVERT_HEIGHT(absolute[3][2]);
+		LOG("Stage coords: (" << x << ", " << y << ", " << z << ")");
 
-    if (collides(pieces)) {
-        // undo fall
-        translate(0, 0, 1);
-        return false;
-    }
-    return true;
+		if (0 > x || x >= STAGE_LENGTH || 0 > y || y >= STAGE_LENGTH) {
+			LOG("bounds collide");
+			return true;
+		}
+
+		if (z < 0) {
+			LOG("floor collide");
+			return true;
+		}
+
+		if (z >= levels) {
+			LOG("block too high, skipping");
+			continue;
+		}
+
+		if (stage[z][GET_SLICE_IDX(y, x)] != nullptr) {
+			LOG("stage collide");
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void OctrisPiece::add_to_board(OctrisStage &stage) {
+	for (auto block : blocks) {
+		LOG("Adding block to board!");
+		glm::mat4x3 absolute = block->transform->make_local_to_world();
+		LOG("World coords: (" << absolute[3][0] << ", " << absolute[3][1] << ", " << absolute[3][2] << ")");
+
+		/**
+		 * Create a new Transform that's relative to the world
+		 * The origin is centered and rotations should be only by 90 degrees around x, y, or z axis, so we can safely
+		 * ignore.
+		 */
+		block->transform = new Scene::Transform();
+		glm::vec3 &pos = block->transform->position;
+		pos.x = absolute[3][0];
+		pos.y = absolute[3][1];
+		pos.z = absolute[3][2];
+
+		int x = CONVERT_LENGTH(pos.x);
+		int y = CONVERT_LENGTH(pos.y);
+		int z = CONVERT_HEIGHT(pos.z);
+		LOG("Stage coords: (" << x << ", " << y << ", " << z << ")");
+
+		assert(0 <= x && x < STAGE_LENGTH);
+		assert(0 <= y && y < STAGE_LENGTH);
+		assert(0 <= z);
+
+		while (z >= stage.size()) {
+			stage.emplace_back();
+		}
+
+		assert(stage[z][GET_SLICE_IDX(y, x)] == nullptr);
+		stage[z][GET_SLICE_IDX(y, x)] = block;
+	}
+}
+
+bool OctrisPiece::move(OctrisStage &stage, int x, int y, int z, int phi, int theta, int psi) {
+	glm::vec3 old_pos = origin.position;
+	glm::quat old_rot = origin.rotation;
+
+	rotate(phi, theta, psi);
+	translate(x, y, z);
+
+	if (collides(stage)) {
+		// undo
+		origin.position = old_pos;
+		origin.rotation = old_rot;
+		return false;
+	}
+	return true;
+}
+
+bool OctrisPiece::fall(OctrisStage &stage) {
+	if (!move(stage, 0, 0, -1, 0, 0, 0)) {
+		add_to_board(stage);
+		return false;
+	}
+	return true;
 }

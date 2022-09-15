@@ -5,10 +5,15 @@
 #include <glm/glm.hpp>
 
 #include <array>
+#include <cmath>
 
-#define BLOCK_LENGTH 2							// Meters, block is 2m x 2m x 2m
-#define STAGE_LENGTH (10 * (BLOCK_LENGTH))		// Meters, stage floor is 10 blocks x 10 blocks
-#define STAGE_HEIGHT (8 * (BLOCK_LENGTH))		// Meters, stage is 20 blocks tall not counting floor
+#define BLOCK_LENGTH 2		// Meters, block is 2m x 2m x 2m
+#define STAGE_LENGTH 10		// stage floor is 10 blocks x 10 blocks
+#define STAGE_HEIGHT 20		// stage is 20 blocks tall not counting floor
+
+#define CONVERT_LENGTH(X) (((int)std::floor(X + 0.5f) - 1) / 2 + 5)
+#define CONVERT_HEIGHT(Z) (((int)std::floor(Z + 0.5f) - 1) / 2)
+#define GET_SLICE_IDX(Y, X) ((Y) * STAGE_LENGTH + (X))
 
 // Location all pieces initial are at on creation
 const glm::vec3 SPAWN_POS = glm::vec3(0.0f, 0.0f, (float)(STAGE_HEIGHT));
@@ -32,8 +37,21 @@ extern Scene::Drawable::Pipeline CUBE_PIPELINE_PURPLE;
 
 extern Scene::Drawable *OCTRIS_BASE;
 
+/**
+ * Stage is (STAGE_HEIGHT) slices of (BLOCK_LENGTH) by (BLOCK_LENGTH) planes (row-major) stacked together.
+ */
+typedef std::array< Scene::Drawable *, STAGE_LENGTH * STAGE_LENGTH > OctrisSlice;
+typedef std::vector< OctrisSlice > OctrisStage;
+
+// All the piece types
 enum OctrisPieceType {
-	CUBE
+	O, // 2-deep cube
+	I, // 2x4 plane
+	T, // 2-deep T shape
+	S, // 2-deep S shape
+	L, // 2-deep L shape
+	Z, // Two parallel 2x2 planes touching on one corner
+	P, // 3x3 plane with a corner cut out
 };
 
 // An 8-block octris piece (pseudo-hierarchy)
@@ -42,24 +60,36 @@ struct OctrisPiece {
 	OctrisPiece(OctrisPieceType type);
 	OctrisPiece(OctrisPiece const &) = delete;
 
-	// Transform tracking the origin of this piece
-	Scene::Transform transform;
+	// Tracks the origin of this piece
+	Scene::Transform origin;
 
-	// Transforms for each of the component blocks making up this piece
-	std::array< Scene::Transform, 8> block_transforms;
+	// Offsets for each of the component blocks making up this piece
+	std::array< Scene::Transform, 8> block_offsets;
 
 	// Drawables for each of the component blocks making up this piece
-	std::vector< Scene::Drawable > blocks;
+	std::vector< Scene::Drawable * > blocks;
 
-	// Whether we should be hiding each of the component blocks (set to true once cleared)
-	std::array< bool, 8 > should_hide = { false, false, false, false, false, false, false, false };
-
+	// Translate piece w.r.t board coordiantes
 	void translate(int x, int y, int z);
 
-	bool collides(const std::vector< OctrisPiece * > &pieces);
+	// Rotate piece (args are factors of pi/2, angles in radians)
+	void rotate(int phi, int theta, int psi);
 
-	bool fall(const std::vector< OctrisPiece * > &pieces);
+	// Checks if this piece collides with any block on the board
+	bool collides(OctrisStage &stage);
+
+	// Adds this piece's blocks to the board
+	void add_to_board(OctrisStage &stage);
+
+	/**
+	 * Moves this piece by the specified amounts if it does not collide with stage, returning true.
+	 * If movement would cause collision, do not move and return false.
+	 */
+	bool OctrisPiece::move(OctrisStage &stage, int x, int y, int z, int phi, int theta, int psi);
+
+	/**
+	 * Attempts move(board, 0, 0, -1). If false, adds this piece to the board.
+	 */
+	bool fall(OctrisStage &stage);
 };
-
-// TODO: More pieces here
 
