@@ -85,7 +85,7 @@ struct OctrisPiece {
 	 * Moves this piece by the specified amounts if it does not collide with stage, returning true.
 	 * If movement would cause collision, do not move and return false.
 	 */
-	bool OctrisPiece::move(OctrisStage &stage, int x, int y, int z, int phi, int theta, int psi);
+	bool move(OctrisStage &stage, int x, int y, int z, int phi, int theta, int psi);
 
 	/**
 	 * Attempts move(board, 0, 0, -1). If false, adds this piece to the board.
